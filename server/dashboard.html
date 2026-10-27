@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relais — vue serveur | TP Crypto</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --panel: #121c2e;
+    --panel-2: #18243a;
+    --line: #24344f;
+    --text: #e6edf7;
+    --muted: #8fa3c0;
+    --accent: #38bdf8;
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --red: #fb7185;
+    --violet: #c084fc;
+    --mono: ui-monospace, SFMono-Regular, "Cascadia Code", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+  }
+  header {
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, #0f1a2e 0%, var(--bg) 100%);
+    display: flex; flex-wrap: wrap; gap: 12px 24px;
+    align-items: center; justify-content: space-between;
+  }
+  h1 { margin: 0; font-size: 20px; font-weight: 650; letter-spacing: .2px; }
+  h1 span { color: var(--accent); }
+  .sub { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px; border-radius: 999px;
+    background: rgba(74, 222, 128, .1);
+    border: 1px solid rgba(74, 222, 128, .35);
+    color: var(--green); font-size: 12px; font-weight: 600;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+         box-shadow: 0 0 8px var(--green); }
+  main { padding: 18px 24px 40px; }
+  .cards { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 10px 14px; min-width: 150px;
+  }
+  .card .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .8px; }
+  .card .value { font-family: var(--mono); font-size: 16px; margin-top: 4px; }
+  .toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+  .toolbar .spacer { flex: 1; }
+  button {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
+    padding: 7px 12px; border-radius: 7px; cursor: pointer; font-size: 12.5px;
+  }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  .hint { color: var(--muted); font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12.5px; }
+  thead th {
+    text-align: left; color: var(--muted); font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: .7px;
+    padding: 8px 10px; border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; background: var(--bg); z-index: 1;
+  }
+  tbody td { padding: 8px 10px; border-bottom: 1px solid rgba(36, 52, 79, .55); vertical-align: top; }
+  tbody tr:hover { background: rgba(56, 189, 248, .045); }
+  .time { color: var(--muted); white-space: nowrap; }
+  .route { white-space: nowrap; }
+  .from { color: var(--violet); }
+  .to { color: var(--accent); }
+  .tag {
+    display: inline-block; padding: 2px 7px; border-radius: 5px;
+    font-size: 11px; font-weight: 600; border: 1px solid;
+  }
+  .tag.hs { color: var(--amber); border-color: rgba(251, 191, 36, .4); background: rgba(251, 191, 36, .08); }
+  .tag.msg { color: var(--green); border-color: rgba(74, 222, 128, .4); background: rgba(74, 222, 128, .08); }
+  .tag.other { color: var(--muted); border-color: var(--line); }
+  .details { color: #b9c8de; }
+  .empty { color: var(--muted); text-align: center; padding: 34px 10px; font-family: system-ui; }
+  details summary { cursor: pointer; color: var(--muted); }
+  details summary:hover { color: var(--accent); }
+  pre {
+    margin: 8px 0 0; padding: 10px; max-width: 720px; max-height: 260px;
+    overflow: auto; background: #0a1424; border: 1px solid var(--line);
+    border-radius: 8px; color: #9fb3cc; font-size: 11.5px; white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .warn {
+    margin: 14px 0 0; padding: 10px 14px; border-radius: 9px;
+    background: rgba(251, 191, 36, .07); border: 1px solid rgba(251, 191, 36, .25);
+    color: #f7d489; font-size: 12.5px;
+  }
+  .rooms { display: flex; gap: 6px; flex-wrap: wrap; }
+  .room-chip {
+    font-family: var(--mono); font-size: 11.5px; padding: 3px 8px;
+    border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line);
+  }
+  .room-chip b { color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Relais de chat — <span>vue serveur</span></h1>
+    <div class="sub">Ce que le serveur (et un attaquant sur le réseau) peut réellement lire.</div>
+  </div>
+  <div class="badge"><span class="dot"></span> Chiffrement de bout en bout — aucun contenu en clair</div>
+</header>
+
+<main>
+  <div class="cards">
+    <div class="card"><div class="label">Participants</div><div class="value" id="participants">0</div></div>
+    <div class="card"><div class="label">Enveloppes relayées</div><div class="value" id="messages">0</div></div>
+    <div class="card"><div class="label">En attente</div><div class="value" id="queued">0</div></div>
+    <div class="card" style="min-width: 220px;">
+      <div class="label">Salons</div>
+      <div class="value rooms" id="rooms" style="font-size: 12px; margin-top: 6px;">—</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <span class="hint">Rafraîchissement automatique chaque seconde.</span>
+    <span class="spacer"></span>
+    <button id="clear">Effacer le journal</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:90px">Heure</th>
+        <th style="width:190px">Route</th>
+        <th style="width:110px">Type</th>
+        <th>Détails de l'enveloppe (chiffrée)</th>
+        <th style="width:80px">Taille</th>
+      </tr>
+    </thead>
+    <tbody id="rows">
+      <tr><td colspan="5" class="empty">Aucune enveloppe pour l'instant. Lancez deux clients…</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn">
+    Vous ne verrez ici que des champs comme <code>iv</code>, <code>ct</code>,
+    <code>ek</code>, <code>kem_ct</code> et des tailles. En AES-ECB, vous pouvez
+    toutefois repérer des <strong>blocs identiques</strong> : c'est déjà une fuite.
+    Le serveur ne détient aucune clé : le clair n'existe que chez les clients.
+  </div>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let paused = false;
+
+function b64len(s) {
+  if (!s || typeof s !== "string") return 0;
+  return Math.floor((s.length * 3) / 4) - (s.split("=").length - 1);
+}
+
+function fmtTime(ts) {
+  if (!ts) return "—";
+  const d = new Date(ts * 1000);
+  return d.toLocaleTimeString("fr-FR", { hour12: false });
+}
+
+function kindOf(payload) {
+  if (!payload || !payload.t) return ["other", "?"];
+  if (payload.t === "hs") return ["hs", "handshake"];
+  if (payload.t === "msg") return ["msg", "message"];
+  return ["other", payload.t];
+}
+
+function summarize(payload) {
+  if (!payload) return "—";
+  if (payload.t === "hs") {
+    const parts = [payload.step || "hs"];
+    if (payload.alg) parts.push(payload.alg);
+    for (const field of ["pub", "id_pub", "sig", "x_pub", "salt"]) {
+      if (payload[field]) parts.push(field + "=" + b64len(payload[field]) + "o");
+    }
+    return parts.join("  ");
+  }
+  if (payload.t === "msg") {
+    const parts = [];
+    if (payload.n !== undefined) parts.push("n=" + payload.n);
+    if (payload.alg) parts.push(payload.alg);
+    for (const field of ["iv", "ct", "ek", "kem_ct", "x_pub"]) {
+      if (payload[field]) parts.push(field + "=" + b64len(payload[field]) + "o");
+    }
+    return parts.join("  ");
+  }
+  return JSON.stringify(payload).slice(0, 100);
+}
+
+function addCell(row, text, className) {
+  const td = document.createElement("td");
+  if (className) td.className = className;
+  td.textContent = text;
+  row.appendChild(td);
+  return td;
+}
+
+function render(entries) {
+  const tbody = $("rows");
+  tbody.replaceChildren();
+  if (!entries.length) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 5;
+    td.className = "empty";
+    td.textContent = "Aucune enveloppe pour l'instant. Lancez deux clients…";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+  for (const env of entries.slice().reverse()) {
+    const tr = document.createElement("tr");
+    addCell(tr, fmtTime(env.ts), "time");
+
+    const route = document.createElement("td");
+    route.className = "route";
+    const from = document.createElement("span");
+    from.className = "from";
+    from.textContent = env.from || "?";
+    route.appendChild(from);
+    route.appendChild(document.createTextNode(" → "));
+    const to = document.createElement("span");
+    to.className = "to";
+    to.textContent = env.to || "(salon)";
+    route.appendChild(to);
+    tr.appendChild(route);
+
+    const [cls, label] = kindOf(env.payload);
+    const typeTd = document.createElement("td");
+    const tag = document.createElement("span");
+    tag.className = "tag " + cls;
+    tag.textContent = label;
+    typeTd.appendChild(tag);
+    tr.appendChild(typeTd);
+
+    const detailTd = document.createElement("td");
+    detailTd.className = "details";
+    const details = document.createElement("details");
+    const summary = document.createElement("summary");
+    summary.textContent = summarize(env.payload);
+    details.appendChild(summary);
+    const pre = document.createElement("pre");
+    pre.textContent = JSON.stringify(env.payload, null, 2);
+    details.appendChild(pre);
+    detailTd.appendChild(details);
+    tr.appendChild(detailTd);
+
+    addCell(tr, (JSON.stringify(env).length / 1024).toFixed(2) + " Ko", "time");
+    tbody.appendChild(tr);
+  }
+}
+
+async function refresh() {
+  if (paused) return;
+  try {
+    const [state, log] = await Promise.all([
+      fetch("/api/state").then((r) => r.json()),
+      fetch("/api/log?limit=150").then((r) => r.json()),
+    ]);
+    const members = state.rooms.reduce((sum, room) => sum + room.members.length, 0);
+    $("participants").textContent = members;
+    $("messages").textContent = state.stats.messages;
+    $("queued").textContent = state.stats.queued;
+
+    const rooms = $("rooms");
+    rooms.replaceChildren();
+    if (!state.rooms.length) {
+      rooms.textContent = "—";
+    } else {
+      for (const room of state.rooms) {
+        const chip = document.createElement("span");
+        chip.className = "room-chip";
+        const name = document.createElement("b");
+        name.textContent = room.room;
+        chip.appendChild(name);
+        chip.appendChild(document.createTextNode(" : " + room.members.join(", ")));
+        rooms.appendChild(chip);
+      }
+    }
+    render(log);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+$("clear").addEventListener("click", async () => {
+  paused = true;
+  await fetch("/api/log", { method: "DELETE" });
+  paused = false;
+  refresh();
+});
+
+refresh();
+setInterval(refresh, 1000);
+</script>
+</body>
+</html>

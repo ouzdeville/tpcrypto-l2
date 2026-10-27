@@ -1,0 +1,24 @@
+# Environnements et caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Clés générées pendant le TP : NE JAMAIS versionner
+keys/
+*.pem
+*.key
+
+# Journaux et captures
+logs/
+*.pcap
+*.pcapng
+*.jsonl
+
+# Éditeurs
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

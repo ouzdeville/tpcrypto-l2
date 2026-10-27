@@ -1,0 +1,11 @@
+# Dépendances du TP crypto
+# Python 3.10+ recommandé (testé avec 3.12)
+
+fastapi>=0.110
+uvicorn[standard]>=0.29
+websockets>=13
+cryptography>=44
+
+# Repli pour ML-KEM si la version de cryptography installée est < 50.
+# (Avec cryptography >= 50, ML-KEM est natif et kyber-py n'est pas utilisé.)
+kyber-py>=1.2
