@@ -1,4 +1,4 @@
-# TP Crypto — Chat chiffré de bout en bout
+# TP Crypto — Chat chiffré de bout en bout : L2 IA-CS
 
 **Version étudiant — L2 cybersécurité — 3 h 15 à 3 h 30, par binôme.**
 
