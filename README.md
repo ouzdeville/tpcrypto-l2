@@ -5,9 +5,6 @@
 Un vrai chat avec serveur central, chiffré de bout en bout : AES,
 Diffie-Hellman, RSA, ML-KEM, signatures, attaque MITM.
 
-> Ce dépôt est la **version étudiant**. Le guide enseignant (qui contient les
-> réponses) n'est pas inclus.
-
 ---
 
 ## Commencer ici
