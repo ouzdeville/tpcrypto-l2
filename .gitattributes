@@ -1,0 +1,10 @@
+# Normalisation des fins de ligne pour GitHub
+* text=auto
+
+# Scripts Windows / Unix
+*.bat text eol=crlf
+*.sh  text eol=lf
+
+# Fichiers binaires éventuels
+*.pcap   binary
+*.pcapng binary
