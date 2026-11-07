@@ -1,6 +1,6 @@
 # TP Crypto — Chat chiffré de bout en bout
 
-**Version étudiant — L2 cybersécurité — 3 h 15 à 3 h 30, par binôme.**
+**Version étudiant —  cybersécurité — 3 h 15 à 3 h 30, par binôme.**
 
 Un vrai chat avec serveur central, chiffré de bout en bout : AES,
 Diffie-Hellman, RSA, ML-KEM, signatures, attaque MITM.
