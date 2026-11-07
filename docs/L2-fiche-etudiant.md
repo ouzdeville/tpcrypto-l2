@@ -1,4 +1,4 @@
-# TP Crypto — Fiche étudiant L2 Cybersécurité
+# TP Crypto — Fiche étudiant  Cybersécurité
 
 > **Tu n'as besoin que de cette fiche.** Les autres documents
 > (`docs/01` à `docs/06` et `docs/08`) sont optionnels : ils approfondissent un
